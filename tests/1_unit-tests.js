@@ -69,11 +69,44 @@ suite('Unit Tests', function(){
       assert.strictEqual(convertHandler.getString(num, initUnit, returnNum, returnUnit), returnString)
     }
     test('Check example result', function(){
+      assert.isOk(convertHandler.getNum('3.1mi'))
       check_all('3.1mi', 3.1, 'mi', 4.98895, 'km', '3.1 miles converts to 4.98895 kilometers')
     })
     test('Check custom inputs', function(){
+      assert.isOk(convertHandler.getNum('kg'))
       check_all('kg', 1, 'kg', 2.20462, 'lbs', '1 kilograms converts to 2.20462 pounds')
       check_all('2.3L', 2.3, 'L', 0.6076, 'gal', '2.3 liters converts to 0.60760 gallons')
+    })
+  })
+  test('Check case insensitive units', function(){
+    // assert.strictEqual(convertHandler.getUnit('l'), 'L')
+    assert.strictEqual(convertHandler.getReturnUnit('l'), 'gal')
+
+    assert.strictEqual(convertHandler.getUnit('10KM'), 'km')
+    assert.strictEqual(convertHandler.getReturnUnit('KM'), 'mi')
+  })
+  suite('Edge cases', function(){
+    test('check units', function(){
+      assert.strictEqual(convertHandler.getUnit('1gal'), 'gal')
+      assert.strictEqual(convertHandler.getUnit('1lBs'), 'lbs')
+      assert.strictEqual(convertHandler.getUnit('1KM'), 'km')
+
+      assert.strictEqual(convertHandler.getReturnUnit('gal'), 'L')
+      assert.strictEqual(convertHandler.getReturnUnit('lbs'), 'kg')
+      assert.strictEqual(convertHandler.getReturnUnit('km'), 'mi')
+    })
+    test('check returned string', function(){
+      const input = '3.1mi'
+      const initNum = convertHandler.getNum(input)
+      const initUnit = convertHandler.getUnit(input)
+      const returnNum = convertHandler.convert(initNum, initUnit)
+      const returnUnit = convertHandler.getReturnUnit(initUnit)
+      const data = {
+        initNum, initUnit,
+        returnNum, returnUnit,
+        string: convertHandler.getString(initNum, initUnit, returnNum, returnUnit)
+      }
+      assert.deepStrictEqual(data, { initNum: 3.1, initUnit: 'mi', returnNum: 4.98895, returnUnit: 'km', string: '3.1 miles converts to 4.98895 kilometers'})
     })
   })
 });
